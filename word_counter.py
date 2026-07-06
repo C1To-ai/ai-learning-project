@@ -1,8 +1,13 @@
 """
 词频统计工具
 读取一个文本文件，统计每个单词出现的频率，按出现次数从高到低排序输出。
+
+用法：
+    python word_counter.py <文件路径>          # 显示全部结果
+    python word_counter.py <文件路径> --top N  # 只显示前 N 个
 """
 
+import argparse
 import sys
 import re
 from collections import Counter
@@ -31,19 +36,28 @@ def count_words(text):
     return Counter(words).most_common()
 
 
-def main():
-    if len(sys.argv) != 2:
-        print("用法：python word_counter.py <文件路径>")
-        print("示例：python word_counter.py sample.txt")
-        sys.exit(1)
+def parse_args():
+    """解析命令行参数"""
+    parser = argparse.ArgumentParser(description="词频统计工具")
+    parser.add_argument("file", help="要分析的文件路径")
+    parser.add_argument("--top", "-n", type=int, help="只显示出现次数最多的前 N 个词")
+    return parser.parse_args()
 
-    file_path = sys.argv[1]
-    text = read_file(file_path)
+
+def main():
+    args = parse_args()
+
+    text = read_file(args.file)
     word_counts = count_words(text)
 
     if not word_counts:
         print("文件中没有找到任何单词。")
         return
+
+    # 如果指定了 --top，只取前 N 个
+    if args.top and args.top > 0:
+        word_counts = word_counts[:args.top]
+        print(f"\n（仅显示前 {args.top} 个）")
 
     # 输出结果
     print(f"\n{'单词':<20} 出现次数")
@@ -51,7 +65,7 @@ def main():
     for word, count in word_counts:
         print(f"{word:<20} {count}")
 
-    print(f"\n总计：{len(word_counts)} 个不同的单词")
+    print(f"\n总计：{args.top if args.top else len(word_counts)} 个不同的单词")
 
 
 if __name__ == "__main__":
