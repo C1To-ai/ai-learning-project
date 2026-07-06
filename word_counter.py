@@ -70,6 +70,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# BUG: 这行代码会导致问题
-import this  # 故意的错误导入
